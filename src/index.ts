@@ -1,6 +1,6 @@
 import express, { Express } from "express"
 import "dotenv/config"
-import openaiController from "../controllers/openaiController"
+import openaiController from "./controllers/openaiController"
 
 const app: Express = express()
 const port = process.env.PORT || 3000
