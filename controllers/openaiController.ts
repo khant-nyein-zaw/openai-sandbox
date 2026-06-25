@@ -1,35 +1,21 @@
 import { Request, Response } from "express"
-import OpenAI from "openai"
+import chatService from "../services/chatService"
 
-const client = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-})
-const model = process.env.OPENAI_MODEL as string
+interface ChatRequest {
+  prompt: string
+  session_id?: string
+}
 
-const generateText = async (req: Request, res: Response) => {
-  const { prompt } = req.body
-
-  if (!prompt || typeof prompt !== "string") {
-    return res.status(400).json({
-      success: false,
-      error: "Missing or invalid `prompt` in request body"
-    })
-  }
+const chat = async (req: Request, res: Response) => {
+  const { prompt, session_id: sessionId }: ChatRequest = req.body
 
   try {
-    const response = await client.responses.create({
-      model,
-      input: prompt,
-      reasoning: { effort: "low" },
-      instructions: "Talk like a Pirate from One-Piece World and you are Luffy",
-      tools: []
-    })
+    const response = await chatService.chat(prompt, sessionId)
     res.status(200).json({
       success: true,
-      data: response.output_text
+      data: response
     })
   } catch (error: any) {
-    console.log(error)
     res.status(400).json({
       success: false,
       error: "Your prompt could not be generated"
@@ -37,5 +23,4 @@ const generateText = async (req: Request, res: Response) => {
   }
 }
 
-
-export default { generateText }
+export default { chat }
